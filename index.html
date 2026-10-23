@@ -142,11 +142,9 @@ body {
   opacity: 0; transition: opacity .12s;
 }
 .menu button .ko { font-family: var(--font-ko); font-weight: 400; font-size: .5em; letter-spacing: 0; text-transform: none; color: var(--haze); text-shadow: none; }
-.menu button:hover, .menu button:focus-visible, .menu button[aria-current="true"] { transform: translateX(8px); outline: none; }
-.menu button:hover::before, .menu button:focus-visible::before, .menu button[aria-current="true"]::before { opacity: 1; }
-.menu button:focus-visible { box-shadow: 0 0 0 2px var(--cyan); }
-.menu .lab { color: var(--rust); text-shadow: 0 0 12px rgba(217,138,61,.5); }
-.menu .lab::before { background: var(--rust); box-shadow: 0 0 10px var(--rust); }
+.menu button:hover, .menu button.active { transform: translateX(8px); outline: none; color: var(--rust); text-shadow: 0 0 12px rgba(217,138,61,.5); }
+.menu button:hover::before, .menu button.active::before { opacity: 1; background: var(--rust); box-shadow: 0 0 10px var(--rust); }
+.menu button:focus-visible { outline: 2px solid var(--rust); outline-offset: 2px; }
 
 .status {
   min-height: 1.6em; margin: 0; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--haze);
@@ -189,9 +187,9 @@ body {
 
     <nav aria-label="메인 메뉴">
       <ul class="menu" id="menu">
-        <li><button type="button" data-id="start" aria-current="true">Start Game <span class="ko">(게임 시작)</span></button></li>
+        <li><button type="button" data-id="start">Start Game <span class="ko">(게임 시작)</span></button></li>
         <li><button type="button" data-id="load">Load Game <span class="ko">(불러오기)</span></button></li>
-        <li><button type="button" data-id="lab" class="lab">Modification Lab <span class="ko">(개조 연구실 / 특전)</span></button></li>
+        <li><button type="button" data-id="lab">Modification Lab <span class="ko">(개조 연구실 / 특전)</span></button></li>
         <li><button type="button" data-id="options">Options <span class="ko">(설정)</span></button></li>
         <li><button type="button" data-id="exit">Exit <span class="ko">(종료)</span></button></li>
       </ul>
@@ -215,15 +213,18 @@ body {
   var index = 0;
   function focusAt(i) {
     index = (i + buttons.length) % buttons.length;
-    buttons.forEach(function (b, n) { b.setAttribute("aria-current", n === index ? "true" : "false"); });
+    clearActive();
+    buttons[index].classList.add("active");
     buttons[index].focus({ preventScroll: true });
   }
+  function clearActive() { buttons.forEach(function (b) { b.classList.remove("active"); }); }
   buttons.forEach(function (b, n) {
-    b.addEventListener("mouseenter", function () { focusAt(n); });
+    b.addEventListener("mouseenter", function () { clearActive(); index = n; });
     b.addEventListener("click", function () {
       status.innerHTML = "<b>" + b.firstChild.textContent.trim() + "</b> — " + msg[b.dataset.id];
     });
   });
+  document.getElementById("menu").addEventListener("mouseleave", clearActive);
   document.addEventListener("keydown", function (e) {
     if (e.key === "ArrowDown") { e.preventDefault(); focusAt(index + 1); }
     else if (e.key === "ArrowUp") { e.preventDefault(); focusAt(index - 1); }
