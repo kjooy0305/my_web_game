@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Human Reconstruction: Survival</title>
+<meta name="description" content="Human Reconstruction: Survival 홈 화면">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Chakra+Petch:wght@500;600;700&family=Gothic+A1:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: full-screen title card. Title and menu stack on the left, the lab scene fills the right and fades into the dark. */
+:root {
+  --void: #0b0d1a;          /* bunker night, blue-biased black */
+  --rust: #d98a3d;          /* corroded orange: selection, SURVIVAL */
+  --cyan: #5fe6ee;          /* menu neon */
+  --cyan-dim: #2a7f8c;
+  --haze: #8fa3b5;          /* secondary text, steel-blue grey */
+  --neon-pink: #ff4f9a;     /* sign frame only */
+
+  --font-display: "Big Shoulders Display", "Impact", "Arial Narrow", sans-serif;
+  --font-ui: "Chakra Petch", "Orbitron", "Segoe UI", sans-serif;
+  --font-ko: "Gothic A1", "Noto Sans KR", "Malgun Gothic", sans-serif;
+
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--cyan);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+}
+
+/* scene art, right side */
+.scene {
+  position: absolute; inset: 0 0 0 auto;
+  width: min(62vw, calc(100vh * 0.913));
+  background: url("hero.webp") right center / cover no-repeat;
+  image-rendering: pixelated;
+  z-index: -3;
+}
+.fade {
+  position: absolute; inset: 0; z-index: -2;
+  background:
+    linear-gradient(90deg, var(--void) 0%, var(--void) 34%, rgba(11,13,26,.72) 52%, rgba(11,13,26,0) 74%),
+    linear-gradient(0deg, rgba(11,13,26,.85), rgba(11,13,26,0) 28%);
+}
+.scan {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+.panel {
+  padding-left: max(16px, env(safe-area-inset-left, 0px), 4vw);
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 4vh;
+  display: grid;
+  gap: clamp(20px, 5vh, 56px);
+  width: min(100%, 760px);
+}
+
+/* title sign */
+.title { margin: 0; display: grid; justify-items: start; gap: 0; line-height: .86; text-transform: uppercase; font-family: var(--font-display); font-weight: 900; }
+.title .human {
+  font-size: clamp(56px, 12vh, 128px);
+  letter-spacing: .04em;
+  color: #1c3a48;
+  -webkit-text-stroke: 2px var(--cyan);
+  text-shadow: 0 0 18px rgba(95,230,238,.55);
+  padding: .06em .3em .02em;
+  border: 3px solid var(--neon-pink);
+  border-radius: 10px;
+  box-shadow: 0 0 14px rgba(255,79,154,.5), inset 0 0 14px rgba(255,79,154,.3);
+  margin-left: clamp(0px, 5vw, 70px);
+  position: relative; z-index: 1;
+}
+.title .recon {
+  font-size: clamp(34px, 7.3vh, 78px);
+  letter-spacing: .02em;
+  color: #17323f;
+  -webkit-text-stroke: 1.5px var(--cyan);
+  text-shadow: 0 0 14px rgba(95,230,238,.4);
+  margin-top: .12em;
+  white-space: nowrap;
+}
+.title .survival {
+  font-size: clamp(64px, 15.5vh, 160px);
+  letter-spacing: .03em;
+  color: #6c7f6b;
+  background: linear-gradient(180deg, #8da38a 0%, #5d7260 55%, #3c4b44 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 2px var(--rust);
+  filter: drop-shadow(0 0 10px rgba(217,138,61,.35));
+  margin-top: -.05em;
+}
+.glitch { animation: glitch 7s steps(1) infinite; }
+@keyframes glitch {
+  0%, 93%, 100% { transform: none; }
+  94% { transform: translateX(-4px); }
+  95% { transform: translateX(5px) skewX(-6deg); }
+  96% { transform: translateX(-2px); }
+}
+
+/* system readout */
+.hud { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--rust); }
+.bar { width: min(250px, 50vw); height: 20px; border: 2px solid var(--rust); padding: 2px; display: flex; gap: 2px; }
+.bar i { flex: 1; background: #3a2c22; }
+.bar i.on { background: var(--rust); }
+.readout { border-left: 2px solid var(--rust); border-right: 2px solid var(--rust); padding: 2px 10px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+
+/* menu */
+.menu { list-style: none; margin: 0; padding: 0 0 0 28px; display: grid; gap: clamp(2px, 1vh, 10px); border-left: 2px solid var(--cyan-dim); position: relative; }
+.menu::before, .menu::after { content: ""; position: absolute; left: -2px; width: 22px; height: 2px; background: var(--cyan-dim); }
+.menu::before { top: 0; } .menu::after { bottom: 0; }
+.menu button {
+  all: unset; box-sizing: border-box; cursor: pointer; width: 100%;
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  padding: clamp(3px, .8vh, 9px) 14px;
+  position: relative;
+  font-family: var(--font-ui); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(22px, 4.3vh, 42px); letter-spacing: .04em;
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(95,230,238,.45);
+  transition: transform .12s ease, color .12s ease;
+}
+.menu button::before {
+  content: ""; position: absolute; left: -2px; top: 12%; bottom: 12%; width: 6px; border-radius: 3px;
+  background: var(--cyan); box-shadow: 0 0 10px var(--cyan);
+  opacity: 0; transition: opacity .12s;
+}
+.menu button .ko { font-family: var(--font-ko); font-weight: 400; font-size: .5em; letter-spacing: 0; text-transform: none; color: var(--haze); text-shadow: none; }
+.menu button:hover, .menu button:focus-visible, .menu button[aria-current="true"] { transform: translateX(8px); outline: none; }
+.menu button:hover::before, .menu button:focus-visible::before, .menu button[aria-current="true"]::before { opacity: 1; }
+.menu button:focus-visible { box-shadow: 0 0 0 2px var(--cyan); }
+.menu .lab { color: var(--rust); text-shadow: 0 0 12px rgba(217,138,61,.5); }
+.menu .lab::before { background: var(--rust); box-shadow: 0 0 10px var(--rust); }
+
+.status {
+  min-height: 1.6em; margin: 0; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--haze);
+  font-family: var(--font-ui);
+}
+.status b { color: var(--cyan); font-weight: 600; }
+.foot { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 2vh; margin: 0; font-size: 12px; letter-spacing: .14em; color: var(--haze); opacity: .8; }
+
+@media (max-width: 720px), (max-aspect-ratio: 1/1) {
+  body { overflow: auto; }
+  .stage { min-height: 100%; align-items: start; }
+  .scene { width: 100%; opacity: .45; background-position: 70% center; }
+  .fade { background: linear-gradient(180deg, rgba(11,13,26,.4), var(--void) 85%); }
+  .title .recon { white-space: normal; }
+  .foot { position: static; padding: 0 16px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glitch { animation: none; }
+  .menu button { transition: none; }
+}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="scene" role="img" aria-label="수술대에 앉아 반쯤 기계화된 남자가 개조받는 폐허 속 연구실"></div>
+  <div class="fade"></div>
+  <div class="scan"></div>
+
+  <div class="panel">
+    <h1 class="title glitch" aria-label="Human Reconstruction: Survival">
+      <span class="human">Human</span>
+      <span class="recon">Reconstruction:</span>
+      <span class="survival">Survival</span>
+    </h1>
+
+    <div class="hud" aria-label="시스템 상태">
+      <div class="bar" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="readout">System: Online<br>Bio-Match: 45%</div>
+    </div>
+
+    <nav aria-label="메인 메뉴">
+      <ul class="menu" id="menu">
+        <li><button type="button" data-id="start" aria-current="true">Start Game <span class="ko">(게임 시작)</span></button></li>
+        <li><button type="button" data-id="load">Load Game <span class="ko">(불러오기)</span></button></li>
+        <li><button type="button" data-id="lab" class="lab">Modification Lab <span class="ko">(개조 연구실 / 특전)</span></button></li>
+        <li><button type="button" data-id="options">Options <span class="ko">(설정)</span></button></li>
+        <li><button type="button" data-id="exit">Exit <span class="ko">(종료)</span></button></li>
+      </ul>
+    </nav>
+    <p class="status" id="status" role="status" aria-live="polite">↑ ↓ 이동 · Enter 선택</p>
+  </div>
+  <p class="foot">v0.1 · 개조 개시 대기 중</p>
+</main>
+
+<script>
+(function () {
+  var buttons = Array.prototype.slice.call(document.querySelectorAll("#menu button"));
+  var status = document.getElementById("status");
+  var msg = {
+    start: "새 개체를 준비하는 중입니다. 게임 화면은 아직 연결되지 않았습니다.",
+    load: "저장된 개체가 없습니다.",
+    lab: "개조 연구실은 아직 잠겨 있습니다.",
+    options: "설정 모듈을 준비하고 있습니다.",
+    exit: "브라우저 탭을 닫아 종료하세요."
+  };
+  var index = 0;
+  function focusAt(i) {
+    index = (i + buttons.length) % buttons.length;
+    buttons.forEach(function (b, n) { b.setAttribute("aria-current", n === index ? "true" : "false"); });
+    buttons[index].focus({ preventScroll: true });
+  }
+  buttons.forEach(function (b, n) {
+    b.addEventListener("mouseenter", function () { focusAt(n); });
+    b.addEventListener("click", function () {
+      status.innerHTML = "<b>" + b.firstChild.textContent.trim() + "</b> — " + msg[b.dataset.id];
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown") { e.preventDefault(); focusAt(index + 1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); focusAt(index - 1); }
+  });
+})();
+</script>
+</body>
+</html>
